@@ -147,13 +147,10 @@ def computer_win_check(board, turn):
     winning_moves = []
 
     hypothetical_board = copy.deepcopy(board)
-
     move = get_valid_moves(hypothetical_board)
 
     for i in move:
-
         hypothetical_board[(i, convert_to_coord(hypothetical_board, i))] = turn
-
         if is_win(hypothetical_board, turn):
 
             winning_moves.append(i)
@@ -176,17 +173,13 @@ def force_win_check(board, turn, next_turn):
     move = get_valid_moves(board)
 
     for i in move:
-
         hypothetical_board1 = copy.deepcopy(board)
-
         hypothetical_board1[(i, convert_to_coord(hypothetical_board1, i))] = turn
 
         move2 = computer_win_check(hypothetical_board1, turn)
 
         if len(move2) > 0:
-
             hypothetical_board2 = copy.deepcopy(hypothetical_board1)
-
             hypothetical_board2[(move2[0], convert_to_coord(hypothetical_board2, move2[0]))] = next_turn
 
             move3 = computer_win_check(hypothetical_board2, turn)
@@ -210,9 +203,7 @@ def pick_random_safe_move(board, turn, next_turn):
     safe_and_ideal = []
 
     for move in valid_moves:
-
         hypothetical_board = copy.deepcopy(board)
-
         hypothetical_board[(move, convert_to_coord(hypothetical_board, move))] = turn
 
         if len(next_turn_loss_check(hypothetical_board, next_turn)) < 1:
@@ -220,17 +211,12 @@ def pick_random_safe_move(board, turn, next_turn):
             safe_moves.append(move)
 
     for move in safe_moves:
-
         hypothetical_board = copy.deepcopy(board)
-
         hypothetical_board[(move, convert_to_coord(hypothetical_board, move))] = turn
 
         if len(computer_win_check(hypothetical_board, turn)) < 1:
 
             safe_and_ideal.append(move)
-
-    print(f'Safe and ideal moves = {safe_and_ideal}')
-    print(f'Safe moves = {safe_moves}')
 
     if len(safe_and_ideal) > 0:
         return [safe_and_ideal[round((len(safe_and_ideal) - 1) * random.random())]]
@@ -244,23 +230,18 @@ def pick_random_safe_move(board, turn, next_turn):
 def AI_decision():
     '''AI checks conditions from most to least important, then does the move. If a move is found it skips the rest of the tests'''
     move = computer_win_check(board_positions, turn)
-    print(f'Found winning move, move = {move}')
     if len(move) < 1:
 
         move = next_turn_loss_check(board_positions, next_turn)
-        print(f'Must block or lose, move = {move}')
         if len(move) < 1:
 
             move = force_win_check(board_positions, turn, next_turn)
-            print(f'Found a move to force a win, move = {move}')
             if len(move) < 1:
 
                 move = forced_loss_check(board_positions, turn, next_turn)
-                print(f'Must block an incoming forced loss, move = {move}')
                 if len(move) < 1:
 
                     move = pick_random_safe_move(board_positions, turn, next_turn)
-                    print(f'Random safe move, move = {move}')
 
     # Does the move by changing the value of the position to the computer's turn's value
     board_positions[(move[0], convert_to_coord(board_positions, move[0]))] = turn
