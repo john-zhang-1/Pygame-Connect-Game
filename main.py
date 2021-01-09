@@ -381,7 +381,7 @@ while running:
             screen.blit(arial_s.render('Tie Game!', True, white), (220, 25))
         else:
             screen.blit(arial_s.render(f'{playing} wins!', True, white), (220, 25))
-
+        
     pygame.display.flip() # makes the window display the game
 
 pygame.quit()
