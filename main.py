@@ -15,7 +15,7 @@ height = 700
 # window options
 fps_clock = pygame.time.Clock()  # set fps of program
 screen = pygame.display.set_mode((width, height))  # set screen size
-pygame.display.set_caption("Connect Four")  # set window caption
+pygame.display.set_caption("Go For Four")  # set window caption
 
 # fonts
 arial = pygame.font.SysFont('Arial', 100)
@@ -180,7 +180,8 @@ def is_tied(board):
 
 
 def computer_win_check(board, turn):
-    '''Creates a hypothetical board with all possible moves the computer can make next and tests each move for a win, then returns all winning moves'''
+    '''Creates a hypothetical board with all possible moves the computer can make next
+    and tests each move for a win, then returns all winning moves'''
     winning_moves = []
 
     hypothetical_board = copy.deepcopy(board)
@@ -198,14 +199,18 @@ def computer_win_check(board, turn):
 
 
 def next_turn_loss_check(board, next_turn):
-    '''creates a hypothetical board with all possible moves the player can make next and tests each move for a win, then returns all winning moves
-    This function should be run after computer_win_check because preventing a loss during the next turn should not precede winning immdediately'''
+    '''creates a hypothetical board with all possible moves the player can make next
+    and tests each move for a win, then returns all winning moves
+    This function should be run after computer_win_check because preventing a loss
+    during the next turn should not precede winning immediately'''
     return computer_win_check(board, next_turn)
 
 
 def force_win_check(board, turn, next_turn):
-    """Creates a hypothetical board and performs each valid move, then creates a second hypothetical board with the move applied, and checks if there is a winning move by the computer
-    If there is, the other player hypothetically attempts to block the winning move, then this function checks once more if there are winning moves.
+    """Creates a hypothetical board and performs each valid move, then creates a second hypothetical board
+    with the move applied, and checks if there is a winning move by the computer
+    If there is, the other player hypothetically attempts to block the winning move,
+    then this function checks once more if there are winning moves.
     If there are, the first hypothetical move is returned as it would result in a forced victory for the computer"""
     move = get_valid_moves(board)
 
@@ -272,15 +277,16 @@ def AI_decision():
     '''AI checks conditions from most to least important, then does the move. If a move is found it skips the rest of the tests'''
     move = computer_win_check(board_positions, turn)
     if len(move) < 1:
+
         move = next_turn_loss_check(board_positions, next_turn)
-
         if len(move) < 1:
+
             move = force_win_check(board_positions, turn, next_turn)
-
             if len(move) < 1:
-                move = forced_loss_check(board_positions, turn, next_turn)
 
+                move = forced_loss_check(board_positions, turn, next_turn)
                 if len(move) < 1:
+
                     move = pick_random_safe_move(board_positions, turn, next_turn)
 
     # Does the move by changing the value of the position to the computer's turn's value
@@ -556,11 +562,14 @@ if __name__ == '__main__':
 
                     end_turn_actions()
 
+                release_left_click = False
+
         if game.state != "playing":
             if game.state == "tied":
                 display_text_ui(0, 10, 700, 80, charcoal, 'Tie Game!', white, False)
             else:
-                display_text_ui(0, 10, 700, 80, light_red if turn == 2 else light_blue, f'{playing} wins!', white, False)
+                display_text_ui(0, 10, 700, 80, light_red if turn == 2
+                                else light_blue, f'{playing} wins!', white, False)
 
             if pygame.time.get_ticks() >= game.start_next_time:
                 display_text_ui(100, 320, 500, 80, charcoal, 'Play Again', white, True)
