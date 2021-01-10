@@ -21,22 +21,52 @@ pygame.display.set_caption("Connect Four")  # set window caption
 arial = pygame.font.SysFont('Arial', 100)
 arial_s = pygame.font.SysFont('Arial', 50)
 
-# mouse location initialized
-mouse_x = 0
-mouse_y = 0
-
 # colours
 white = (255, 255, 255)
 black = (0, 0, 0)
-grey = (216, 223, 235)
+grey = (201, 201, 201)
+charcoal = (43, 42, 42)
+dark_grey = (201, 201, 201)
 
-blue = (3, 136, 252)
+blue = (42, 28, 230)
 light_blue = (136, 179, 247)
 lightest_blue = (189, 214, 255)
+dark_blue = (27, 16, 179)
 
-red = (219, 11, 0)
+blue_gradients = []
+for i in range(8):
+    blue_gradients.append((light_blue[0] - i * 3, light_blue[1] - i * 3, light_blue[2] - i * 3))
+blue_gradients.extend(blue_gradients[::-1])
+
+light_blue_gradients = []
+for i in range(8):
+    light_blue_gradients.append((lightest_blue[0] - i * 3, lightest_blue[1] - i * 3, lightest_blue[2] - i * 3))
+light_blue_gradients.extend(light_blue_gradients[::-1])
+
+red = (207, 32, 23)
 light_red = (240, 149, 144)
 lightest_red = (255, 228, 227)
+dark_red = (163, 14, 7)
+
+red_gradients = []
+for i in range(8):
+    red_gradients.append((light_red[0] - i * 3, light_red[1] - i * 3, light_red[2] - i * 3))
+red_gradients.extend(red_gradients[::-1])
+
+light_red_gradients = []
+for i in range(8):
+    light_red_gradients.append((lightest_red[0] - i * 3, lightest_red[1] - i * 3, lightest_red[2] - i * 3))
+light_red_gradients.extend(light_red_gradients[::-1])
+
+# sound effects
+piece_drop = pygame.mixer.Sound("sounds/Piece drop.wav")
+pygame.mixer.Sound.set_volume(piece_drop, 0.8)
+game_over = pygame.mixer.Sound("sounds/Game Over.wav")
+pygame.mixer.Sound.set_volume(game_over, 0.8)
+
+# music
+pygame.mixer.music.load("sounds/Playing music.wav")
+pygame.mixer.music.set_volume(0.4)
 
 # turn order
 turn = 1
@@ -46,8 +76,9 @@ next_turn = 2
 x_points = [50, 150, 250, 350, 450, 550, 650]
 y_points = [150, 250, 350, 450, 550, 650]
 
+
 def convert_to_coord(board, column):
-    '''Given a legend num, return the row the piece will land'''
+    '''Given a column, return the row the piece will land'''
     if column == 0:
         return 0
     for row in y_points[::-1]:
@@ -67,6 +98,12 @@ def get_valid_moves(board):
             valid_moves.append(i)
 
     return valid_moves
+
+
+def make_move(board, column, turn):
+    '''Given the column, board and turn, places the turn piece on the column of the board'''
+    board[(column, convert_to_coord(board, column))] = turn
+    pygame.mixer.Channel(1).play(piece_drop)
 
 
 def four_in_a_row(board, y_level, turn):
@@ -150,7 +187,7 @@ def computer_win_check(board, turn):
     move = get_valid_moves(hypothetical_board)
 
     for i in move:
-        hypothetical_board[(i, convert_to_coord(hypothetical_board, i))] = turn
+        make_move(hypothetical_board, i, turn)
         if is_win(hypothetical_board, turn):
 
             winning_moves.append(i)
@@ -174,19 +211,23 @@ def force_win_check(board, turn, next_turn):
 
     for i in move:
         hypothetical_board1 = copy.deepcopy(board)
-        hypothetical_board1[(i, convert_to_coord(hypothetical_board1, i))] = turn
+        make_move(hypothetical_board1, i, turn)
 
         move2 = computer_win_check(hypothetical_board1, turn)
 
         if len(move2) > 0:
+
             hypothetical_board2 = copy.deepcopy(hypothetical_board1)
-            hypothetical_board2[(move2[0], convert_to_coord(hypothetical_board2, move2[0]))] = next_turn
 
-            move3 = computer_win_check(hypothetical_board2, turn)
+            if len(next_turn_loss_check(hypothetical_board2, next_turn)) < 1:
 
-            if len(move3) > 0 and len(next_turn_loss_check(hypothetical_board2, next_turn)) < 1:
+                make_move(hypothetical_board2, move2[0], next_turn)
 
-                return [i]
+                move3 = computer_win_check(hypothetical_board2, turn)
+
+                if len(move3) > 0:
+
+                    return [i]
     return []
 
 
@@ -204,7 +245,7 @@ def pick_random_safe_move(board, turn, next_turn):
 
     for move in valid_moves:
         hypothetical_board = copy.deepcopy(board)
-        hypothetical_board[(move, convert_to_coord(hypothetical_board, move))] = turn
+        make_move(hypothetical_board, move, turn)
 
         if len(next_turn_loss_check(hypothetical_board, next_turn)) < 1:
 
@@ -212,7 +253,7 @@ def pick_random_safe_move(board, turn, next_turn):
 
     for move in safe_moves:
         hypothetical_board = copy.deepcopy(board)
-        hypothetical_board[(move, convert_to_coord(hypothetical_board, move))] = turn
+        make_move(hypothetical_board, move, turn)
 
         if len(computer_win_check(hypothetical_board, turn)) < 1:
 
@@ -231,21 +272,23 @@ def AI_decision():
     '''AI checks conditions from most to least important, then does the move. If a move is found it skips the rest of the tests'''
     move = computer_win_check(board_positions, turn)
     if len(move) < 1:
-
         move = next_turn_loss_check(board_positions, next_turn)
+
         if len(move) < 1:
-
             move = force_win_check(board_positions, turn, next_turn)
+
             if len(move) < 1:
-
                 move = forced_loss_check(board_positions, turn, next_turn)
-                if len(move) < 1:
 
+                if len(move) < 1:
                     move = pick_random_safe_move(board_positions, turn, next_turn)
 
     # Does the move by changing the value of the position to the computer's turn's value
-    board_positions[(move[0], convert_to_coord(board_positions, move[0]))] = turn
-
+    move = (move[0], convert_to_coord(board_positions, move[0]))
+    make_move(board_positions, move[0], turn)
+    global last_move
+    # changes global variable last_move to this move
+    last_move = move
 
 def create_board_positions():
     '''Reads the csv file that gives the pixel positions of the circles and creates a dictionary with initial values 0 as all circles are empty'''
@@ -256,13 +299,10 @@ def create_board_positions():
 
 class circle:
     '''Circle class creating each circle in the game'''
-    highlighted = False
-    expected_move = False
-    value = 0
 
     def __init__(self, position):
         self.position = position
-        self.draw()
+        self.reset()
 
     def get_colour(self):
 
@@ -270,118 +310,265 @@ class circle:
 
             if self.highlighted: # if the circle is highlighted while empty, it becomes a lighter colour of the current turn
 
+                frame = ((pygame.time.get_ticks() % 2000))
+                frame = frame // 125
+
                 if self.expected_move:  # if bottommost playable location, darker
+
                     if turn == 1:
-                        return light_red
+                        return red_gradients[frame]
+
                     else:
-                        return light_blue
+                        return blue_gradients[frame]
 
                 else:   # lighter colour for the circles of the column
                     if turn == 1:
-                        return lightest_red
+                        return light_red_gradients[frame]
                     else:
-                        return lightest_blue
+                        return light_blue_gradients[frame]
 
             else:   # if empty and not the highlighted column, grey
                 return grey
 
         elif self.value == 1:   # if not empty, the circle is the colour of the piece played
-            return red
-
+            if self.last_move:
+                return dark_red
+            else:
+                return red
         else:
-            return blue
+            if self.last_move:
+                return dark_blue
+            else:
+                return blue
 
     # draw method displays the circle on the pygame window
     def draw(self):
+        if self.last_move:
+            pygame.draw.circle(screen, black, self.position, 45)
         pygame.draw.circle(screen, self.get_colour(), self.position, 40)
 
-# creates a empty board
-board_positions = create_board_positions()
 
-# defines highlighted_col and expected_row initially to run the game
-highlighted_col = 0
-expected_row = 0
+    def reset(self):
+        self.highlighted = False
+        self.expected_move = False
+        self.value = 0
+        self.last_move = False
 
-# creates list of circle objects for each key in the board_positions dictionary used for drawing and storing information about board states
-circles = [circle(position) for position in board_positions]
 
-# game conditions
-tied = False
-game = "playing"
+def display_text_ui(x_position, y_position, width, height, box_colour, text, text_colour, button):
+    '''Draws text on the screen'''
+    # If the text being drawn is on a button
+    if button:
+        # If mouse is hovering on it
+        if (x_position < mouse_location[0] < x_position + width and
+                y_position < mouse_location[1] < y_position + height):
+            # if left click is happening while mouse is hovering over the button,
+            # brighten the colour
+            if left_click:
+                colour_adjust = 15
+            # if mouse is hovering over the button and the mouse is not being clicked,
+            # brighten the colour even more
+            else:
+                colour_adjust = 25
+                # if left mouse button has been released this frame
+                if release_left_click:
 
-# randomly selects player or computer to play first
-coin_flip = random.randint(0, 1)
+                    if text == 'Play Again':
 
-if coin_flip == 1:
-    playing = "Computer"
-    next_to_play = "Player"
-else:
-    playing = "Player"
-    next_to_play = "Computer"
+                        reset()
+                        return
 
-# main game loop
-running = True
-while running:
+            new_colour = (box_colour[0] + colour_adjust, box_colour[1] + colour_adjust, box_colour[2] + colour_adjust)
+            pygame.draw.rect(screen, new_colour, (x_position, y_position, width, height))
 
-    for event in pygame.event.get():
+        else: # if the mouse is not hovering over the button
+            pygame.draw.rect(screen, box_colour, (x_position, y_position, width, height))
 
-        if event.type == pygame.QUIT: # loops stops when game is quit
+    else: # if not a button
+        pygame.draw.rect(screen, box_colour, (x_position, y_position, width, height))
 
-            running = False
+    # choose text settings
+    displayed_text = arial_s.render(text, True, text_colour)
+    # blit text onto box
+    screen.blit(displayed_text, (x_position + width/2 - displayed_text.get_width()/2,
+                                 y_position + height/2 - displayed_text.get_height()/2))
 
-        if playing == "Player" and event.type == pygame.MOUSEBUTTONUP and game == "playing":
-            if expected_row != 0: # if a column is full, expected_row will be 0 to ensure move cannot be played
-                board_positions[(highlighted_col, expected_row)] = turn # modifies dictionary storing game board state
 
-                if is_win(board_positions, turn):
-                    game = "over"
-                elif is_tied(board_positions):
-                    game = "over"
-                    tied = True
-                else:
-                    turn, next_turn = next_turn, turn # goes to next turn
-                    playing, next_to_play = next_to_play, playing # keeps track of whose turn it is to display and for winning message
-
-    screen.fill(black)  # makes background black
-
-    mouse_location = pygame.mouse.get_pos() # stores mouse location in variable for use
+def find_expected_row_and_column():
     for i in x_points:
         if mouse_location[0] < i + 50 and mouse_location[0] > i - 50 and mouse_location[1] > 100:
-            highlighted_col =  i
             # the column over which the mouse is hovering will be highlighted
-            break
+            return i, convert_to_coord(board_positions, i)
+    return 0, 0
 
-    expected_row = convert_to_coord(board_positions, highlighted_col)
-    # finds the location the piece would appear if dropped on the highlighted col
+
+def get_first_player():
+    # randomly selects player or computer to play first
+    coin_flip = random.randint(0, 1)
+
+    if coin_flip == 1:
+        playing = "Computer"
+        next_to_play = "Player"
+    else:
+        playing = "Player"
+        next_to_play = "Computer"
+
+    return playing, next_to_play
+
+
+def end_turn_actions():
+    '''Functions called at the end of a player's turn after their move has been made'''
+    global turn, next_turn, playing, next_to_play
+    if is_win(board_positions, turn):
+        game.set_state("won")
+    elif is_tied(board_positions):
+        game.set_state("tied")
+    else:
+        playing, next_to_play = next_to_play, playing  # keeps track of whose turn it is for piece colours
+    turn, next_turn = next_turn, turn  # goes to next turn
+
+
+def initialize():
+    global board_positions, highlighted_col, expected_row, last_move, circles, tied, game
+    global mouse_location, left_click, release_left_click, playing, next_to_play
+    # creates a empty board
+    board_positions = create_board_positions()
+
+    # defines highlighted_col, expected_row and last_move initially to run the game
+    highlighted_col = 0
+    expected_row = 0
+    last_move = (0, 0)
+
+    # creates list of circle objects for each key in the board_positions dictionary
+    # used for drawing and storing information about board states
+    circles = [circle(position) for position in board_positions]
+
+    # game conditions
+    game = Game("playing")
+
+    # input conditions
+    mouse_location = (0, 0)
+    left_click = False
+    release_left_click = False
+
+    playing, next_to_play = get_first_player()
+
+    # starts music
+    pygame.mixer.music.play(-1)
+
+
+def reset():
+    '''Resets game states for playing again'''
+    global board_positions, highlighted_col, expected_row, last_move, circles, tied, game
+    global mouse_location, left_click, release_left_click, playing, next_to_play
+
+    board_positions = {key: 0 for key in board_positions}
+
+    highlighted_col = 0
+    expected_row = 0
+    last_move = (0, 0)
 
     for circle in circles:
-        circle.value = board_positions[circle.position] # current value of circle, 0 for empty, 1 and 2 for played on that turn
-        circle.highlighted = circle.position[0] == highlighted_col  # if the circle's position is in the highlighted column the circle is highlighted
-        circle.expected_move = circle.position == (highlighted_col, expected_row) # of the circle is the bottommost circle of the column it will be darker
-        circle.draw()
+        circle.reset()
+    # game conditions
+    game = Game("playing")
 
-    if game == "playing":
-        screen.blit(arial_s.render(f'{playing} to play', True, white), (220, 25)) # displays turn message
+    # input conditions
+    mouse_location = (0, 0)
+    left_click = False
+    release_left_click = False
 
-        if playing == "Computer":
-            AI_decision()   # computer chooses a move
+    playing, next_to_play = get_first_player()
 
-            if is_win(board_positions, turn):
-                game = "over"
-                turn, next_turn = next_turn, turn
-            elif is_tied(board_positions):
-                game = "over"
-                tied = True
+    # unpauses music
+    pygame.mixer.music.unpause()
+
+
+class Game:
+    '''Game state class to trigger functions at the moment when a game ends'''
+    def __init__(self, state):
+        self.state = state
+
+    def set_state(self, new_state):
+        if self.state != new_state:
+            self.state = new_state
+            self.game_over_process()
+
+    def game_over_process(self):
+        self.start_next_time = pygame.time.get_ticks() + 5000
+        # pauses music and plays game over effect
+        pygame.mixer.music.pause()
+        pygame.mixer.Channel(0).play(game_over)
+
+
+if __name__ == '__main__':
+
+    initialize()
+
+    # main game loop
+    running = True
+    while running:
+        # Check for all occurrences of events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: # loops stops when game is quit
+                running = False
+            if event.type == pygame.MOUSEBUTTONUP: # checks for left click being released
+                release_left_click = True
+
+        # storing user inputs in variables in the frame to use for functions
+        mouse_location = pygame.mouse.get_pos()  # stores mouse location in variable
+        left_click = pygame.mouse.get_pressed(num_buttons=3)[0] # stores left click in variable
+
+        screen.fill(white)  # makes background black
+
+        # finds the column the mouse is hovering over and the expected location where the piece would land
+        highlighted_col, expected_row = find_expected_row_and_column()
+
+        for circle in circles:
+            # current value of circle, 0 for empty, 1 and 2 for played on that turn
+            circle.value = board_positions[circle.position]
+
+            if circle.value == 0:
+                # if the circle's position is in the highlighted column the circle is highlighted
+                circle.highlighted = circle.position[0] == highlighted_col
+                # of the circle is the bottommost circle of the column it will be darker
+                circle.expected_move = circle.position == (highlighted_col, expected_row)
+
+            # if the circle's position is the same as the last move it will be darker
+            circle.last_move = circle.position == last_move
+            # draws the circle
+            circle.draw()
+
+        if game.state == "playing":
+            display_text_ui(0, 10, 700, 80, charcoal, f'{playing} to play', white, False)
+
+            if playing == "Computer":
+                AI_decision()   # computer chooses a move
+                pygame.mixer.Channel(1).play(piece_drop)
+
+                end_turn_actions()
+
+            if playing == "Player" and release_left_click:
+                if expected_row != 0:  # if a column is full, expected_row will be 0 to ensure move cannot be played
+                    last_move = (highlighted_col, expected_row) # stores move in global variable last_move
+                    board_positions[last_move] = turn  # modifies dictionary storing game board state
+                    pygame.mixer.Channel(1).play(piece_drop)
+
+                    end_turn_actions()
+
+        if game.state != "playing":
+            if game.state == "tied":
+                display_text_ui(0, 10, 700, 80, charcoal, 'Tie Game!', white, False)
             else:
-                turn, next_turn = next_turn, turn
-                playing, next_to_play = next_to_play, playing
+                display_text_ui(0, 10, 700, 80, light_red if turn == 2 else light_blue, f'{playing} wins!', white, False)
 
-    if game == "over":
-        if tied:
-            screen.blit(arial_s.render('Tie Game!', True, white), (220, 25))
-        else:
-            screen.blit(arial_s.render(f'{playing} wins!', True, white), (220, 25))
-        
-    pygame.display.flip() # makes the window display the game
+            if pygame.time.get_ticks() >= game.start_next_time:
+                display_text_ui(100, 320, 500, 80, charcoal, 'Play Again', white, True)
+            if release_left_click:
+                game.start_next_time = 0
 
-pygame.quit()
+        release_left_click = False
+
+        pygame.display.flip() # makes the window display the game
+        fps_clock.tick(64)
+    pygame.quit()
