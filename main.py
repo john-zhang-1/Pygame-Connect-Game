@@ -22,41 +22,34 @@ arial = pygame.font.SysFont('Arial', 100)
 arial_s = pygame.font.SysFont('Arial', 50)
 
 # colours
+
+def create_gradient(initial_col, change, frames):
+    '''Returns a list of RGB colour values of a gradient of a given colour meant for a pulsing animation'''
+    gradient = []
+    for i in range(frames//2):
+        gradient.append((initial_col[0] - i * change, initial_col[1] - i * change, initial_col[2] - i * change))
+    return gradient + gradient[::-1]
+
 white = (255, 255, 255)
 black = (0, 0, 0)
 grey = (201, 201, 201)
 charcoal = (43, 42, 42)
-dark_grey = (201, 201, 201)
 
 blue = (42, 28, 230)
 light_blue = (136, 179, 247)
 lightest_blue = (189, 214, 255)
 dark_blue = (27, 16, 179)
 
-blue_gradients = []
-for i in range(8):
-    blue_gradients.append((light_blue[0] - i * 3, light_blue[1] - i * 3, light_blue[2] - i * 3))
-blue_gradients.extend(blue_gradients[::-1])
-
-light_blue_gradients = []
-for i in range(8):
-    light_blue_gradients.append((lightest_blue[0] - i * 3, lightest_blue[1] - i * 3, lightest_blue[2] - i * 3))
-light_blue_gradients.extend(light_blue_gradients[::-1])
+blue_gradients = create_gradient(light_blue, 3, 16)
+light_blue_gradients = create_gradient(lightest_blue, 3, 16)
 
 red = (207, 32, 23)
 light_red = (240, 149, 144)
 lightest_red = (255, 228, 227)
 dark_red = (163, 14, 7)
 
-red_gradients = []
-for i in range(8):
-    red_gradients.append((light_red[0] - i * 3, light_red[1] - i * 3, light_red[2] - i * 3))
-red_gradients.extend(red_gradients[::-1])
-
-light_red_gradients = []
-for i in range(8):
-    light_red_gradients.append((lightest_red[0] - i * 3, lightest_red[1] - i * 3, lightest_red[2] - i * 3))
-light_red_gradients.extend(light_red_gradients[::-1])
+red_gradients = create_gradient(light_red, 3, 16)
+light_red_gradients = create_gradient(lightest_red, 3, 16)
 
 # sound effects
 piece_drop = pygame.mixer.Sound("sounds/Piece drop.wav")
