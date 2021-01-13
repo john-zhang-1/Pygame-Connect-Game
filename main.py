@@ -21,14 +21,16 @@ pygame.display.set_caption("Go For Four")  # set window caption
 arial = pygame.font.SysFont('Arial', 100)
 arial_s = pygame.font.SysFont('Arial', 50)
 
+
 # colours
 
 def create_gradient(initial_col, change, frames):
-    '''Returns a list of RGB colour values of a gradient of a given colour meant for a pulsing animation'''
+    """Returns a list of RGB colour values of a gradient of a given colour meant for a pulsing animation"""
     gradient = []
-    for i in range(frames//2):
+    for i in range(frames // 2):
         gradient.append((initial_col[0] - i * change, initial_col[1] - i * change, initial_col[2] - i * change))
     return gradient + gradient[::-1]
+
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -54,6 +56,7 @@ light_red_gradients = create_gradient(lightest_red, 3, 16)
 # sound effects
 piece_drop = pygame.mixer.Sound("sounds/Piece drop.wav")
 pygame.mixer.Sound.set_volume(piece_drop, 0.8)
+
 game_over = pygame.mixer.Sound("sounds/Game Over.wav")
 pygame.mixer.Sound.set_volume(game_over, 0.8)
 
@@ -71,7 +74,8 @@ y_points = [150, 250, 350, 450, 550, 650]
 
 
 def convert_to_coord(board, column):
-    '''Given a column, return the row the piece will land'''
+    """Given a column, return the row the piece will land"""
+
     if column == 0:
         return 0
     for row in y_points[::-1]:
@@ -81,32 +85,31 @@ def convert_to_coord(board, column):
 
 
 def get_valid_moves(board):
-    '''A list of all valid moves' locations is created'''
+    """A list of all valid moves' locations is created"""
     valid_moves = []
 
     for i in x_points:
 
         if board[(i, 150)] == 0:
-
             valid_moves.append(i)
 
     return valid_moves
 
 
 def make_move(board, column, turn):
-    '''Given the column, board and turn, places the turn piece on the column of the board'''
+    """Given the column, board and turn, places the turn piece on the column of the board"""
     board[(column, convert_to_coord(board, column))] = turn
     pygame.mixer.Channel(1).play(piece_drop)
 
 
 def four_in_a_row(board, y_level, turn):
-    '''Returns True if 4 on the given y level are connected, otherwise returns False'''
+    """Returns True if 4 on the given y level are connected, otherwise returns False"""
 
-    for i in range(len(x_points)- 3):
+    for i in range(len(x_points) - 3):
 
         if (
-        turn == board[(x_points[i], y_level)] == board[(x_points[i+1], y_level)] ==
-        board[(x_points[i+2], y_level)] == board[(x_points[i+3], y_level)]
+                turn == board[(x_points[i], y_level)] == board[(x_points[i + 1], y_level)] ==
+                board[(x_points[i + 2], y_level)] == board[(x_points[i + 3], y_level)]
         ):
             return True
 
@@ -115,13 +118,13 @@ def four_in_a_row(board, y_level, turn):
 
 
 def four_in_a_column(board, x_level, turn):
-    '''returns True if 4 on the given x level are connected, otherwise returns False'''
+    """returns True if 4 on the given x level are connected, otherwise returns False"""
 
-    for i in range(len(y_points)- 3):
+    for i in range(len(y_points) - 3):
 
         if (
-        turn == board[(x_level, y_points[i])] == board[(x_level, y_points[i+1])]
-        == board[(x_level, y_points[i+2])] == board[(x_level, y_points[i+3])]
+                turn == board[(x_level, y_points[i])] == board[(x_level, y_points[i + 1])]
+                == board[(x_level, y_points[i + 2])] == board[(x_level, y_points[i + 3])]
         ):
             return True
 
@@ -130,7 +133,7 @@ def four_in_a_column(board, x_level, turn):
 
 
 def is_win(board, turn):
-    '''Checks all winning combinations for a player and returns True if that player has won'''
+    """Checks all winning combinations for a player and returns True if that player has won"""
     for i in y_points:
 
         if four_in_a_row(board, i, turn):
@@ -141,40 +144,40 @@ def is_win(board, turn):
         if four_in_a_column(board, j, turn):
             return True
 
-    for k in range(3,7):
+    for k in range(3, 7):
 
-        for l in range(0,3):
+        for l in range(0, 3):
 
             if (
 
-            turn == board[(x_points[k], y_points[l])]
-                    == board[(x_points[k-1], y_points[l+1])]
-                    == board[(x_points[k-2], y_points[l+2])]
-                    == board[(x_points[k-3], y_points[l+3])]
+                    turn == board[(x_points[k], y_points[l])]
+                    == board[(x_points[k - 1], y_points[l + 1])]
+                    == board[(x_points[k - 2], y_points[l + 2])]
+                    == board[(x_points[k - 3], y_points[l + 3])]
             ):
                 return True
 
-    for k in range(0,4):
+    for k in range(0, 4):
 
-        for l in range(0,3):
+        for l in range(0, 3):
 
             if (
-            turn == board[(x_points[k], y_points[l])]
-                    == board[(x_points[k+1], y_points[l+1])]
-                    == board[(x_points[k+2], y_points[l+2])]
-                    == board[(x_points[k+3], y_points[l+3])]
+                    turn == board[(x_points[k], y_points[l])]
+                    == board[(x_points[k + 1], y_points[l + 1])]
+                    == board[(x_points[k + 2], y_points[l + 2])]
+                    == board[(x_points[k + 3], y_points[l + 3])]
             ):
                 return True
 
 
 def is_tied(board):
-    '''Checks if there are no moves left to be played'''
-    return all(value != 0 for value in board_positions.values())
+    """Checks if there are no moves left to be played"""
+    return all(value != 0 for value in board.values())
 
 
 def computer_win_check(board, turn):
-    '''Creates a hypothetical board with all possible moves the computer can make next
-    and tests each move for a win, then returns all winning moves'''
+    """Creates a hypothetical board with all possible moves the computer can make next
+    and tests each move for a win, then returns all winning moves"""
     winning_moves = []
 
     hypothetical_board = copy.deepcopy(board)
@@ -183,7 +186,6 @@ def computer_win_check(board, turn):
     for i in move:
         make_move(hypothetical_board, i, turn)
         if is_win(hypothetical_board, turn):
-
             winning_moves.append(i)
 
         hypothetical_board = copy.deepcopy(board)
@@ -192,10 +194,10 @@ def computer_win_check(board, turn):
 
 
 def next_turn_loss_check(board, next_turn):
-    '''creates a hypothetical board with all possible moves the player can make next
+    """creates a hypothetical board with all possible moves the player can make next
     and tests each move for a win, then returns all winning moves
     This function should be run after computer_win_check because preventing a loss
-    during the next turn should not precede winning immediately'''
+    during the next turn should not precede winning immediately"""
     return computer_win_check(board, next_turn)
 
 
@@ -224,19 +226,19 @@ def force_win_check(board, turn, next_turn):
                 move3 = computer_win_check(hypothetical_board2, turn)
 
                 if len(move3) > 0:
-
                     return [i]
     return []
 
 
 def forced_loss_check(board, turn, next_turn):
-    '''Sees if the computer can be forced to lose with the same strategy as the one described in force_win_check by the player, returns the move that will block the forced win'''
+    """Sees if the computer can be forced to lose with the same strategy as the one described in force_win_check by the player, returns the move that will block the forced win"""
     return force_win_check(board, next_turn, turn)
 
 
 def pick_random_safe_move(board, turn, next_turn):
-    '''Returns a random move that does not result in an instant loss and doesn't result in a win condition getting taken away
-    If that is impossible, returns a random move that does not result in an instant loss. Otherwise, returns a random move'''
+    """Returns a random move that does not result in an instant loss and doesn't result in a win condition getting 
+    taken away If that is impossible, returns a random move that does not result in an instant loss. Otherwise, 
+    returns a random move """
     valid_moves = get_valid_moves(board)
     safe_moves = []
     safe_and_ideal = []
@@ -246,7 +248,6 @@ def pick_random_safe_move(board, turn, next_turn):
         make_move(hypothetical_board, move, turn)
 
         if len(next_turn_loss_check(hypothetical_board, next_turn)) < 1:
-
             safe_moves.append(move)
 
     for move in safe_moves:
@@ -254,7 +255,6 @@ def pick_random_safe_move(board, turn, next_turn):
         make_move(hypothetical_board, move, turn)
 
         if len(computer_win_check(hypothetical_board, turn)) < 1:
-
             safe_and_ideal.append(move)
 
     if len(safe_and_ideal) > 0:
@@ -267,7 +267,7 @@ def pick_random_safe_move(board, turn, next_turn):
 
 
 def AI_decision():
-    '''AI checks conditions from most to least important, then does the move. If a move is found it skips the rest of the tests'''
+    """AI checks conditions from most to least important, then does the move. If a move is found it skips the rest of the tests"""
     move = computer_win_check(board_positions, turn)
     if len(move) < 1:
 
@@ -279,7 +279,6 @@ def AI_decision():
 
                 move = forced_loss_check(board_positions, turn, next_turn)
                 if len(move) < 1:
-
                     move = pick_random_safe_move(board_positions, turn, next_turn)
 
     # Does the move by changing the value of the position to the computer's turn's value
@@ -289,15 +288,16 @@ def AI_decision():
     # changes global variable last_move to this move
     last_move = move
 
+
 def create_board_positions():
-    '''Reads the csv file that gives the pixel positions of the circles and creates a dictionary with initial values 0 as all circles are empty'''
+    """Reads the csv file that gives the pixel positions of the circles and creates a dictionary with initial values 0 as all circles are empty"""
     with open("board.csv", "r") as file:
         file_reader = csv.reader(file)
         return {(int(row[0]), int(row[1])): 0 for row in file_reader}
 
 
 class circle:
-    '''Circle class creating each circle in the game'''
+    """Circle class creating each circle in the game"""
 
     def __init__(self, position):
         self.position = position
@@ -305,9 +305,9 @@ class circle:
 
     def get_colour(self):
 
-        if self.value == 0: # if it is empty
+        if self.value == 0:  # if it is empty
 
-            if self.highlighted: # if the circle is highlighted while empty, it becomes a lighter colour of the current turn
+            if self.highlighted:  # if the circle is highlighted while empty, it becomes a lighter colour of the current turn
 
                 frame = ((pygame.time.get_ticks() % 2000))
                 frame = frame // 125
@@ -320,16 +320,16 @@ class circle:
                     else:
                         return blue_gradients[frame]
 
-                else:   # lighter colour for the circles of the column
+                else:  # lighter colour for the circles of the column
                     if turn == 1:
                         return light_red_gradients[frame]
                     else:
                         return light_blue_gradients[frame]
 
-            else:   # if empty and not the highlighted column, grey
+            else:  # if empty and not the highlighted column, grey
                 return grey
 
-        elif self.value == 1:   # if not empty, the circle is the colour of the piece played
+        elif self.value == 1:  # if not empty, the circle is the colour of the piece played
             if self.last_move:
                 return dark_red
             else:
@@ -346,7 +346,6 @@ class circle:
             pygame.draw.circle(screen, black, self.position, 45)
         pygame.draw.circle(screen, self.get_colour(), self.position, 40)
 
-
     def reset(self):
         self.highlighted = False
         self.expected_move = False
@@ -355,7 +354,7 @@ class circle:
 
 
 def display_text_ui(x_position, y_position, width, height, box_colour, text, text_colour, button):
-    '''Draws text on the screen'''
+    """Draws text on the screen"""
     # If the text being drawn is on a button
     if button:
         # If mouse is hovering on it
@@ -373,24 +372,23 @@ def display_text_ui(x_position, y_position, width, height, box_colour, text, tex
                 if release_left_click:
 
                     if text == 'Play Again':
-
                         reset()
                         return
 
             new_colour = (box_colour[0] + colour_adjust, box_colour[1] + colour_adjust, box_colour[2] + colour_adjust)
             pygame.draw.rect(screen, new_colour, (x_position, y_position, width, height))
 
-        else: # if the mouse is not hovering over the button
+        else:  # if the mouse is not hovering over the button
             pygame.draw.rect(screen, box_colour, (x_position, y_position, width, height))
 
-    else: # if not a button
+    else:  # if not a button
         pygame.draw.rect(screen, box_colour, (x_position, y_position, width, height))
 
     # choose text settings
     displayed_text = arial_s.render(text, True, text_colour)
     # blit text onto box
-    screen.blit(displayed_text, (x_position + width/2 - displayed_text.get_width()/2,
-                                 y_position + height/2 - displayed_text.get_height()/2))
+    screen.blit(displayed_text, (x_position + width / 2 - displayed_text.get_width() / 2,
+                                 y_position + height / 2 - displayed_text.get_height() / 2))
 
 
 def find_expected_row_and_column():
@@ -416,7 +414,7 @@ def get_first_player():
 
 
 def end_turn_actions():
-    '''Functions called at the end of a player's turn after their move has been made'''
+    """Functions called at the end of a player's turn after their move has been made"""
     global turn, next_turn, playing, next_to_play
     if is_win(board_positions, turn):
         game.set_state("won")
@@ -457,7 +455,7 @@ def initialize():
 
 
 def reset():
-    '''Resets game states for playing again'''
+    """Resets game states for playing again"""
     global board_positions, highlighted_col, expected_row, last_move, circles, tied, game
     global mouse_location, left_click, release_left_click, playing, next_to_play
 
@@ -484,7 +482,8 @@ def reset():
 
 
 class Game:
-    '''Game state class to trigger functions at the moment when a game ends'''
+    """Game state class to trigger functions at the moment when a game ends"""
+
     def __init__(self, state):
         self.state = state
 
@@ -509,14 +508,14 @@ if __name__ == '__main__':
     while running:
         # Check for all occurrences of events
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: # loops stops when game is quit
+            if event.type == pygame.QUIT:  # loops stops when game is quit
                 running = False
-            if event.type == pygame.MOUSEBUTTONUP: # checks for left click being released
+            if event.type == pygame.MOUSEBUTTONUP:  # checks for left click being released
                 release_left_click = True
 
         # storing user inputs in variables in the frame to use for functions
         mouse_location = pygame.mouse.get_pos()  # stores mouse location in variable
-        left_click = pygame.mouse.get_pressed(num_buttons=3)[0] # stores left click in variable
+        left_click = pygame.mouse.get_pressed(num_buttons=3)[0]  # stores left click in variable
 
         screen.fill(white)  # makes background black
 
@@ -542,14 +541,14 @@ if __name__ == '__main__':
             display_text_ui(0, 10, 700, 80, charcoal, f'{playing} to play', white, False)
 
             if playing == "Computer":
-                AI_decision()   # computer chooses a move
+                AI_decision()  # computer chooses a move
                 pygame.mixer.Channel(1).play(piece_drop)
 
                 end_turn_actions()
 
             if playing == "Player" and release_left_click:
                 if expected_row != 0:  # if a column is full, expected_row will be 0 to ensure move cannot be played
-                    last_move = (highlighted_col, expected_row) # stores move in global variable last_move
+                    last_move = (highlighted_col, expected_row)  # stores move in global variable last_move
                     board_positions[last_move] = turn  # modifies dictionary storing game board state
                     pygame.mixer.Channel(1).play(piece_drop)
 
@@ -562,7 +561,7 @@ if __name__ == '__main__':
                 display_text_ui(0, 10, 700, 80, charcoal, 'Tie Game!', white, False)
             else:
                 display_text_ui(0, 10, 700, 80, light_red if turn == 2
-                                else light_blue, f'{playing} wins!', white, False)
+                else light_blue, f'{playing} wins!', white, False)
 
             if pygame.time.get_ticks() >= game.start_next_time:
                 display_text_ui(100, 320, 500, 80, charcoal, 'Play Again', white, True)
@@ -571,6 +570,6 @@ if __name__ == '__main__':
 
         release_left_click = False
 
-        pygame.display.flip() # makes the window display the game
+        pygame.display.flip()  # makes the window display the game
         fps_clock.tick(64)
     pygame.quit()
