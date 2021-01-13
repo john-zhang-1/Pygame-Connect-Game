@@ -20,3 +20,7 @@ November 4th, 2011
 
 Bit Forest Intro music by Bertsz
 November 19th, 2020
+
+![](Demo Video_Trim.gif)
+![Alt text](Demo Video_Trim.gif)
+![](https://github.com/john-zhang-uoft/Pygame-Connect-Game/blob/main/Demo%20Video_Trim.gif)
