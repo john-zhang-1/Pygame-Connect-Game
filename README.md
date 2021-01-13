@@ -1,6 +1,6 @@
 # Pygame-Get-4-in-a-row-Game
 
-Player vs AI 4-in-a-row game made with Pygame. First game game made ever, first time using the pygame framework. Made individually without following tutorials.
+Player vs AI 4-in-a-row game made with Pygame. My first ever game and my first time using the pygame framework. Made individually without following tutorials.
 
 
 To use:
