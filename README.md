@@ -7,7 +7,7 @@ To use:
 Download all the files and ensure that they are in the same folder. Run the main python file to start the game.
 
 
-![](Demo Video_Trim.gif)
+![](Pygame-Connect-Game/Demo Video_Trim.gif)
 
 
 Sound effect credits:
