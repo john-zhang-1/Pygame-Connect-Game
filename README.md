@@ -7,8 +7,13 @@ To use:
 Download all the files and ensure that they are in the same folder. Run the main python file to start the game.
 
 
+![](Demo Video_Trim.gif)
+
+
 
 Sound effect credits:
+
+All sound effects were found on freesound.org licensed under the Creative Commons 0 License.
 
 switch 17.wav by patchytherat
 August 18th, 2020
@@ -18,5 +23,3 @@ November 4th, 2011
 
 Bit Forest Intro music by Bertsz
 November 19th, 2020
-
-All found on freesound.org licensed under the Creative Commons 0 License.
