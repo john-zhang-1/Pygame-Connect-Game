@@ -6,7 +6,7 @@ Player vs AI 4-in-a-row game made with Pygame. First game game made ever, first 
 To use:
 Download all the files and ensure that they are in the same folder. Run the main python file to start the game.
 
-![Output Sample](Demo Video_Trim.gif)
+![](Demo Video_Trim.gif)
 
 Sound effect credits:
 
