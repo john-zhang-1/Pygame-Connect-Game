@@ -10,7 +10,6 @@ Download all the files and ensure that they are in the same folder. Run the main
 ![](Demo Video_Trim.gif)
 
 
-
 Sound effect credits:
 
 All sound effects were found on freesound.org licensed under the Creative Commons 0 License.
