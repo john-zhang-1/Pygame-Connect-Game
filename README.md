@@ -9,7 +9,8 @@ Download all the files and ensure that they are in the same folder. Run the main
 
 Demo with sounds: https://www.youtube.com/watch?v=jnbZois49Rg
 
-Demo:
+Quick Demo:
+
 ![](https://github.com/john-zhang-uoft/Pygame-Connect-Game/blob/main/Demo%20Video_Trim.gif)
 
 Sound effect credits:
