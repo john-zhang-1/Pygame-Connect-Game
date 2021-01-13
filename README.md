@@ -6,6 +6,12 @@ Player vs AI 4-in-a-row game made with Pygame. First game game made ever, first 
 To use:
 Download all the files and ensure that they are in the same folder. Run the main python file to start the game.
 
+
+Demo with sounds: https://www.youtube.com/watch?v=jnbZois49Rg
+
+Demo:
+![](https://github.com/john-zhang-uoft/Pygame-Connect-Game/blob/main/Demo%20Video_Trim.gif)
+
 Sound effect credits:
 
 All sound effects were found on freesound.org licensed under the Creative Commons 0 License.
@@ -18,8 +24,3 @@ November 4th, 2011
 
 Bit Forest Intro music by Bertsz
 November 19th, 2020
-
-Demo with sounds: https://www.youtube.com/watch?v=jnbZois49Rg
-
-Demo:
-![](https://github.com/john-zhang-uoft/Pygame-Connect-Game/blob/main/Demo%20Video_Trim.gif)
